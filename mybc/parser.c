@@ -5,13 +5,8 @@ int lookahead;
 /*
 LL(1) grammar:
 
-E -> T R
-T -> F Q
-F -> (E) | DEC | ID
-R -> +T R | -T R | <>
-Q -> *F Q | /F Q | <>
-S → aSR | c
-R → bS | <>
+E -> [oplus] T R
+oplus = '+' || '-'
 */
 
 // E -> [oplus] T R
@@ -20,29 +15,16 @@ void E(void) {
     if(lookahead == '+' || lookahead == '-') {
         match(lookahead);
     }
-_T():
-    T(); 
-    // R -> {oplus T }
-    // oplus = '+' || '-'
-    while(lookahead == '+' || lookahead == '-') match(lookahead); goto _T();
-}
 
-// T -> F Q
-void T(void) { 
-_F():
-    F(); 
-    // Q -> {otimes F }
-    // otimes = '*' || '/'
-    while(lookahead == '*' || lookahead == '/') match(lookahead); goto _F();
-    
-}
+_T:
 
-// F -> (E) | DEC | ID | OCT | HEX
-void F(void)
-{
+_F:
+
     switch(lookahead) {
         case '(':
-            match('('); E(); match(')');
+            match('('); 
+            E(); 
+            match(')');
             break;
         case DEC:
             match(DEC);
@@ -56,21 +38,13 @@ void F(void)
         default:
             match(ID);
     }
-}
+    // Q -> {otimes F }
+    // otimes = '*' || '/'
+    if (lookahead == '*' || lookahead == '/') { match(lookahead); goto _F; }
 
-// R -> {oplus T }
-// oplus = '+' || '-'
-void R(void)
-{
-    while(lookahead == '+' || lookahead == '-') match(lookahead); T();
-}
-
-
-// Q -> {otimes F }
-// otimes = '*' || '/'
-void Q(void)
-{
-    while(lookahead == '*' || lookahead == '/') match(lookahead); F();
+    // R -> {oplus T }
+    // oplus = '+' || '-'
+    if (lookahead == '+' || lookahead == '-') { match(lookahead); goto _T; }
 }
 
 void match(int expected)
