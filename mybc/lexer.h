@@ -7,9 +7,10 @@ enum {
     DEC,
     OCT,
     HEX,
-    ASGN, // ASGN = ":="
+    NUM,
+    ASGN, // ASGN = ":=",
 } ;
 
 extern int linenum;
 extern int gettoken(FILE *);
-extern char lexeme[];
+extern char lexeme[MAXIDLEN+1];

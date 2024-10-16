@@ -11,14 +11,13 @@ int linenum = 1;
 int isASGN(FILE *tape)
 {
 	lexeme[0] = getc(tape);
-
-	if ( isalpha(lexeme[0]) ) {
-		if (lexeme[0] == ':') {
-			if (lexeme[1] == '=') {
-    /*6*/printf("isASGN");/*6*/
-				return ASGN;
-			}
+	if (lexeme[0] == ':') {
+		lexeme[1] = getc(tape);
+		if (lexeme[1] == '=') {
+			lexeme[2] = 0;
+			return ASGN;
 		}
+        ungetc(lexeme[1], tape);
 	}
 
 	ungetc(lexeme[0], tape);
@@ -33,7 +32,8 @@ int isID(FILE *tape)
 	int i = 0;
 	lexeme[i] = getc(tape);
 
-	if ( isalpha(lexeme[i++]) ) {
+	if ( isalpha(lexeme[i]) ) {
+		i = 1;
 		while ( isalnum(lexeme[i] = getc(tape))) {
 			if(i < MAXIDLEN) i++;
 		}
@@ -90,21 +90,30 @@ void skipspaces(FILE *tape) {
 // 0012
 int isOCT(FILE *tape)
 {
-	int head = getc(tape);
+    int i = 0;
+    lexeme[i] = getc(tape);
 
-	if (isdigit(head)) {
-		if (head == '0') {
-			while(isdigit(head = getc(tape))) {
-				if(head > '7') {
-					ungetc(head, tape);
+	if (isdigit(lexeme[i])) {
+		if (lexeme[i] == '0') {
+        	i = 1;
+			while(isdigit(lexeme[i] = getc(tape))) {
+				if(lexeme[i] > '7') {
+					ungetc(lexeme[i], tape);
+            		ungetc('0', tape);
+					i--;
+					lexeme[i] = 0;
 					return 0;
+				} else {
+					i++;
 				}
 			}
-			ungetc(head, tape);
+			ungetc(lexeme[i], tape);
+			lexeme[i] = 0;
 			return OCT;
 		}
 	}
-	ungetc(head, tape);
+    ungetc(lexeme[i], tape);
+    lexeme[i] = 0;
 	return 0;
 }
 
@@ -114,34 +123,156 @@ int isOCT(FILE *tape)
 // 0x112
 int isHEX(FILE *tape)
 {
-	int head = getc(tape);
+	int i = 0;
+	lexeme[i] = getc(tape);
 
-	if (isdigit(head)) {
-		if (head == '0' && (toupper(head = getc(tape)) == 'X')) {
+	if (isdigit(lexeme[i])) {
+		i = 1;
+		if (lexeme[i] == '0' && (toupper(lexeme[i] = getc(tape)) == 'X')) {
 			do {
-				if(!(isalnum(head = getc(tape))) || head > 'F') {
-					ungetc(head, tape);
+				if(!(isalnum(lexeme[i] = getc(tape))) || lexeme[i] > 'F') {
+					ungetc(lexeme[i], tape);
+					lexeme[i] = 0;
 					return 0;
 				}
-			} while (isalnum(head = getc(tape)));
+			} while (isalnum(lexeme[i] = getc(tape)));
 			
-			ungetc(head, tape);
+			ungetc(lexeme[i], tape);
+			lexeme[i] = 0;
 			return HEX;
 		}
 	}
-	ungetc(head, tape);
+    ungetc(lexeme[i], tape);
+    lexeme[i] = 0;
 	return 0;
 }
 
 
+double lexval;
+int isNUM(FILE *tape)
+{
+	int charCount;
+	charCount = fscanf(tape, "%s", &lexval);
+	if (charCount) return NUM;
+	else return 0;
 
+}
 
+/* FP = DEC.[0-9]* | .[0-9]+ */
+int isFP(FILE *tape)
+{
+    int i;
+    if (isDEC(tape)) {
+        i = strlen(lexeme);
+        if ((lexeme[i] = getc(tape)) != '.') {
+            ungetc(lexeme[i], tape);
+            lexeme[i] = 0;
+            return DEC;
+        }
 
+        i++;
+        while (isdigit(lexeme[i] = getc(tape))) {
+            i++;
+        }
+        ungetc(lexeme[i], tape);
+        lexeme[i] = 0;
+        return 1;
+    }
 
+    i = 0;
+    if ((lexeme[i] = getc(tape)) == '.') {
+        i++;
+        if (! isdigit(lexeme[i] = getc(tape))) {
+            ungetc(lexeme[i], tape);
+            ungetc('.', tape);
+            i--;
+            lexeme[i] = 0;
+            return 0;
+        }
 
+        i++;
+        while (isdigit(lexeme[i] = getc(tape))) {
+            i++;
+        }
+        ungetc(lexeme[i], tape);
+        lexeme[i] = 0;
+        return 1;
+    } 
 
+    ungetc(lexeme[i], tape);
+    lexeme[i] = 0;
+    return 0;
+}
 
+/* EE = [eE]['+''-']?[0-9]+ */ 
+int isEE(FILE *tape) 
+{
+    int i = strlen(lexeme);
+    int e, sign;
+    
+    if (toupper(lexeme[i] = getc(tape)) == 'E') {
+        e = lexeme[i];
+        i++;
+        if ((lexeme[i] = getc(tape)) == '+' || lexeme[i] == '-') {
+            sign = lexeme[i];
+            i++;
+            if (! isdigit(lexeme[i] = getc(tape))) {
+                ungetc(lexeme[i], tape);
+                ungetc(sign, tape);
+                ungetc(e, tape);
+                i -= 2;
+                lexeme[i] = 0;
+                return 0;
+            }
 
+            i++;
+            while (isdigit(lexeme[i] = getc(tape))) {
+                i++;
+            }
+            ungetc(lexeme[i], tape);
+            lexeme[i] = 0;
+            return 1;
+        }    
+
+        if (! isdigit(lexeme[i])) {
+            ungetc(lexeme[i], tape);
+            ungetc(e, tape);
+            i--;
+            lexeme[i] = 0;
+            return 0;
+        }
+
+        i++;
+        while (isdigit(lexeme[i] = getc(tape))) {
+            i++;
+        }
+        ungetc(lexeme[i], tape);
+        lexeme[i] = 0;
+        return 1;
+    }
+
+    ungetc(lexeme[i], tape);
+    lexeme[i] = 0;
+    return 0;
+}
+
+/* FLT = FP EE? | DEC EE */
+int isFLT(FILE *tape)
+{
+    int fp;
+
+    if ((fp = isFP(tape)) == DEC) {
+        if (! isEE(tape)) 
+            return DEC;
+        return NUM;
+
+    } else if (fp) {
+        isEE(tape);
+        return NUM;
+    }
+
+    return 0;
+}
 
 int gettoken(FILE *source)
 {
@@ -150,7 +281,9 @@ int gettoken(FILE *source)
 	if ((token = isHEX(source))) return token;
 	if ((token = isID(source))) return token;
 	if ((token = isOCT(source))) return token;
+    if ((token = isNUM(source))) return token;
 	if ((token = isDEC(source))) return token;
+    if ((token = isASGN(source))) return token; 
 	token = getc(source);
 	return token;
 }
