@@ -2,20 +2,48 @@
 #include <stdio.h>
 #include <lexer.h>
 
+char lexeme[MAXIDLEN+1];
+
 int linenum = 1;
+
+// ASGN = :=
+// Ex: :=
+int isASGN(FILE *tape)
+{
+	lexeme[0] = getc(tape);
+
+	if ( isalpha(lexeme[0]) ) {
+		if (lexeme[0] == ':') {
+			if (lexeme[1] == '=') {
+    /*6*/printf("isASGN");/*6*/
+				return ASGN;
+			}
+		}
+	}
+
+	ungetc(lexeme[0], tape);
+    lexeme[0] = 0;
+	return 0;
+}
+
 // ID = [A-Za-z][A-Za-z0-9]*
 // Ex: abacaXI123
 int isID(FILE *tape)
 {
-	int head = getc(tape);
+	int i = 0;
+	lexeme[i] = getc(tape);
 
-	if ( isalpha(head) ) {
-		while ( isalnum(head = getc(tape)) );
-		ungetc(head, tape);
+	if ( isalpha(lexeme[i++]) ) {
+		while ( isalnum(lexeme[i] = getc(tape))) {
+			if(i < MAXIDLEN) i++;
+		}
+		ungetc(lexeme[i], tape);
+        lexeme[i] = 0;
 		return ID;
 	}
 
-	ungetc(head, tape);
+	ungetc(lexeme[i], tape);
+    lexeme[i] = 0;
 	return 0;
 }
 
@@ -24,18 +52,25 @@ int isID(FILE *tape)
 // 0012 = 0 0 12
 int isDEC(FILE *tape)
 {
-	int head = getc(tape);
+	int i = 0;
+    lexeme[i] = getc(tape);
 
-	if (isdigit(head)) {
-		if (head == '0') {
-			return DEC;
-		}
-		while(isdigit(head = getc(tape)));
-		ungetc(head, tape);
-		return DEC;
-	}
-	ungetc(head, tape);
-	return 0;
+    if (isdigit(lexeme[i])) {
+        if (lexeme[i] == '0') {
+            return DEC;
+        }
+        i = 1;
+        while (isdigit(lexeme[i] = getc(tape))) {
+            i++;
+        }
+        ungetc(lexeme[i], tape);
+        lexeme[i] = 0;
+        return DEC;
+    }
+
+    ungetc(lexeme[i], tape);
+    lexeme[i] = 0;
+    return 0;
 }
 
 

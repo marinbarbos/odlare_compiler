@@ -2,12 +2,29 @@
 #include <parser.h>
 int lookahead;
 
-/*
-LL(1) grammar:
+#include <string.h>
+#define SYMTABSIZE 0x100 // 256
+double acc;
+char symtab[SYMTABSIZE][MAXIDLEN+1];
+double vmeme[SYMTABSIZE];
+int symtab_next_entry = 0;
 
-E -> [oplus] T R
-oplus = '+' || '-'
-*/
+int lookup(char* varname) {
+    int i;
+	for (i = 0; i < symtab_next_entry; i++)
+	{
+		if (strcmp(symtab[i],varname) == 0) break;
+	}
+    if( i == symtab_next_entry) {
+        strcpy(symtab[i], varname);
+    }
+    return i;
+}
+
+void store(char* varname, double value) {
+    int i = lookup(varname);
+    vmeme[i] = value;
+}
 
 // E -> [oplus] T R
 // oplus = '+' || '-'
@@ -19,60 +36,105 @@ void E(void) {
     /*0*/
 
     if(lookahead == '+' || lookahead == '-') {
+        !(lookahead == '-' || signal == lookahead);
         match(lookahead);
     }
 
 _T:
+    T();
 
-_F:
-    int lexema = lookahead;
-    switch(lookahead) {
-        case '(':
-            match('('); 
-            E(); 
-            match(')');
-            break;
-        case DEC:
-            /*1*/printf(" %s ", lexema);/*1*/
-            match(DEC);
-            break;
-        case OCT:
-            /*2*/printf(" %s ", lexema);/*2*/
-            match(OCT);
-            break;
-        case HEX:
-            /*3*/printf(" %s ", lexema);/*3*/
-            match(HEX);
-            break;
-        default:
-            /*4*/printf(" %s ", lexema);/*4*/
-            match(ID);
-    }
-    if(otimes) {
-        printf(" %c ", otimes);
-        otimes = 0;
-    }
-    // Q -> {otimes F }printf(" %s ", lexema);
-    // otimes = '*' || '/'
-    if (lookahead == '*' || lookahead == '/') { 
-        otimes = lookahead;
-        match(lookahead); 
-        goto _F; 
-    }
+    /*1*/
     if(signal) {
-        printf(" %c ", signal);
+        printf ("\tneg acc\n");
         signal = 0;
     }
+    /*1*/
+    
+    /*2*/
     if(oplus) {
-        printf(" %c ", oplus);
+        switch(oplus) {
+            case '+': {
+                printf ("\tadd acc, stack[sp]\n", oplus);
+                break;
+            }
+            case '-': {
+                printf ("\tsub stack[sp], acc\n", oplus);
+                break;
+            }
+        }
         oplus = 0;
     }
-    // R -> {oplus T }
-    // oplus = '+' || '-'
-    if (lookahead == '+' || lookahead == '-') { 
+    /*2*/
+
+    if(lookahead == '+' || lookahead == '-') {
+        /*3*/
         oplus = lookahead;
-        match(lookahead); 
-        goto _T; 
+        printf("\tpush acc\n");
+        /*3*/
+        match(lookahead);
+        goto _T;
+    }
+}
+
+/* T -> F {*F} */
+void T(void)
+{
+    int otimes = 0;
+_F:
+    F();
+
+    /*4*/
+    switch(otimes) {
+        case '*': {
+            printf("\tmul stack[sp], acc\n", otimes);
+            break;
+        }
+        case '/': {
+            printf("\tdiv stack[sp], acc\n", otimes);
+            break;
+        }
+    }
+    otimes = 0;
+    /*4*/
+
+    if (lookahead == '*' || lookahead == '/') {
+        /*5*/
+        otimes = lookahead;
+        printf("\tpush acc\n");
+        /*5*/
+        match(lookahead);
+        goto _F;
+    }
+}
+
+
+/* F -> ID | DEC | OCT | HEX | FLT | ( E ) */
+void F(void)
+{
+    switch(lookahead) {
+    case '(':
+        match('('); 
+        E(); 
+        match(')');
+        break;
+    case DEC:
+        /*6*/printf("\tmov %s, acc\n", lexeme);/*6*/
+        match(DEC);
+        break;
+    case OCT:
+        /*6*/printf("\tsasdasdasdasd %s, acc\n", lexeme);/*6*/
+        match(OCT);
+        break;
+    case HEX:
+        /*6*/printf("\taaaaaaaaaaaaaaaaa %s, acc\n", lexeme);/*6*/
+        match(HEX);
+        break;
+    default:
+        /*7*/printf(" %s ", lexeme);/*7*/
+        match(ID);
+        if (lookahead == ASGN) {
+            match(ASGN); E();
+        }
     }
 }
 
@@ -86,3 +148,17 @@ void match(int expected)
         exit(-3);
     }
 }
+ /*
+ 
+ 
+double recall(char* var) {
+    int i;
+	for (i = 0; i < symtab_next_entry; i++) {
+		if (strcmp(symtab[i], var) == 0) return vmeme[i];
+	}
+	strcpy(symtab[symtab_next_entry], var);
+	symtab_next_entry++;
+	return 0.0;
+}
+
+*/
