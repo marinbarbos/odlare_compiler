@@ -12,5 +12,5 @@ enum {
 } ;
 
 extern int linenum;
-extern int gettoken(FILE *);
+extern int getToken(FILE *);
 extern char lexeme[MAXIDLEN+1];
