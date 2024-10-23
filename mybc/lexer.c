@@ -1,6 +1,7 @@
 #include <ctype.h>
 #include <stdio.h>
 #include <lexer.h>
+#include <string.h>
 
 char lexeme[MAXIDLEN + 1];
 
@@ -46,6 +47,13 @@ int isID(FILE *tape)
         }
         ungetc(lexeme[i], tape);
         lexeme[i] = 0;
+
+        if (strcmp(lexeme, "exit") == 0)
+            return EXIT;
+
+        if (strcmp(lexeme, "quit") == 0)
+            return QUIT;
+
         return ID;
     }
 
@@ -143,7 +151,7 @@ int isHEX(FILE *tape)
     int i = 0;
     lexeme[i] = getc(tape);
 
-// Verifica se há uma sequência de letras e/ou dígitos decimais prefixados por um 0x e se letra não maior que F.
+    // Verifica se há uma sequência de letras e/ou dígitos decimais prefixados por um 0x e se letra não maior que F.
     if (isdigit(lexeme[i]))
     {
         i = 1;
@@ -171,77 +179,21 @@ int isHEX(FILE *tape)
 
 int isNUM(FILE *tape)
 {
-    int charCount;
-    charCount = fscanf(tape, "%s", &lexval);
-    if (charCount)
+    int aux = getc(tape);
+
+    if (isdigit(aux))
+    {
+        ungetc(aux, tape);
+        fscanf(tape, "%lg", &lexval);
+        sprintf(lexeme, "%lg", lexval);
         return NUM;
+    }
 
+    ungetc(aux, tape);
     return 0;
 }
 
-/* FP = DEC.[0-9]* | .[0-9]+ */
 int isFP(FILE *tape)
-{
-    int i;
-
-    // Verifica se há uma sequência de dígitos decimais seguido de um único ponto e de 0 ou outros dígitos decimais.
-    if (isDEC(tape))
-    {
-        i = strlen(lexeme);
-        lexeme[i] = getc(tape);
-
-        // Após encontrar um número decimal, caso não venha um ponto, significa que ele é um decimal não flutuante.
-        if (lexeme[i] != '.')
-        {
-            ungetc(lexeme[i], tape);
-            lexeme[i] = 0;
-            return DEC;
-        }
-
-        i++;
-
-        // Continua realizando a leitura de dígitos após o ponto, caso existam.
-        while (isdigit(lexeme[i] = getc(tape)))
-            i++;
-
-        ungetc(lexeme[i], tape);
-        lexeme[i] = 0;
-        return 1;
-    }
-
-    i = 0;
-    lexeme[i] = getc(tape);
-
-    // Verifica se há uma sequência de um ponto seguido de dígitos decimais.
-    if (lexeme[i] == '.')
-    {
-        i++;
-        // Caso não venha um número após o ponto, o segmento lido é devolvido a fita e o método abortado.
-        if (!isdigit(lexeme[i] = getc(tape)))
-        {
-            ungetc(lexeme[i], tape);
-            ungetc('.', tape);
-            i--;
-            lexeme[i] = 0;
-            return 0;
-        }
-
-        // Continua realizando a leitura de dígitos após o ponto, caso existam.
-        i++;
-        while (isdigit(lexeme[i] = getc(tape)))
-            i++;
-
-        ungetc(lexeme[i], tape);
-        lexeme[i] = 0;
-        return 1;
-    }
-
-    ungetc(lexeme[i], tape);
-    lexeme[i] = 0;
-    return 0;
-}
-
-int isFP2(FILE *tape)
 {
     float value;
     return fscanf(tape, "%f", &value);
@@ -337,16 +289,16 @@ int getToken(FILE *source)
     int token;
     skipSpaces(source);
 
-    if ((token = isHEX(source)))
-        return token;
+    // if ((token = isHEX(source)))
+    //     return token;
     if ((token = isID(source)))
         return token;
-    if ((token = isOCT(source)))
-        return token;
+    // if ((token = isOCT(source)))
+    //     return token;
     if ((token = isNUM(source)))
         return token;
-    if ((token = isDEC(source)))
-        return token;
+    // if ((token = isDEC(source)))
+    //     return token;
     if ((token = isASGN(source)))
         return token;
 

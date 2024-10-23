@@ -2,15 +2,20 @@
 
 #define MAXIDLEN 32
 
-enum {
+enum
+{
+    QUIT = 0,
+    EXIT = 1,
     ID = 1024,
     DEC,
     OCT,
     HEX,
     NUM,
     ASGN, // ASGN = ":=",
-} ;
+    FLT,  
+    EXP
+};
 
 extern int linenum;
 extern int getToken(FILE *);
-extern char lexeme[MAXIDLEN+1];
+extern char lexeme[MAXIDLEN + 1];
