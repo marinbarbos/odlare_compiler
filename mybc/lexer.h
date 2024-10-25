@@ -1,11 +1,21 @@
 #include <stdio.h>
 
-enum {
+#define MAXIDLEN 32
+
+enum
+{
+    QUIT = 0,
+    EXIT = 1,
     ID = 1024,
     DEC,
     OCT,
-    HEX
-} ;
+    HEX,
+    NUM,
+    ASGN, // ASGN = ":=",
+    FLT,  
+    EXP
+};
 
 extern int linenum;
-extern int gettoken(FILE *);
+extern int getToken(FILE *);
+extern char lexeme[MAXIDLEN + 1];

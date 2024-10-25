@@ -8,8 +8,11 @@ extern int linenum;
 int main()
 {
     source = stdin;
-    lookahead = gettoken(source);
-    E();
+    lookahead = getToken(source);
+
+    // Coração da aplicação
+    mybc();
+
     printf("\n%i", lookahead);
     printf("\nNumero de linhas: %i", linenum);
     return 0;
