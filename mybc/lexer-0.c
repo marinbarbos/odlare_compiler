@@ -37,7 +37,7 @@ int isDEC(FILE *tape)
 	return 0;
 }
 
-int gettoken(FILE *source)
+int getToken(FILE *source)
 {
 	if (isID(source)) printf("It's an ID\n");
 	else if (isDEC(source)) printf("It's decimal integer\n");

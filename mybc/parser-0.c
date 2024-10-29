@@ -80,7 +80,7 @@ void Q(void)
 void match(int expected)
 {
     if (lookahead == expected) {
-        lookahead = gettoken(source);
+        lookahead = getToken(source);
     }
     else {
         fprintf(stderr, "token mismatch\n");
