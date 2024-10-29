@@ -15,6 +15,72 @@ void program(void)
     match('.');
 }
 
+void block(void)
+{
+    vardef();
+    sbprgdef();
+    beginend();
+    match('.');
+}
+
+void vardef(void)
+{
+    if (lookahead == VAR)
+    {
+        match(VAR);
+    _idlist:
+        idlist();
+        match(':');
+        type();
+        match(';');
+        if (lookahead == ';')
+        {
+            goto _idlist;
+        }
+    }
+}
+
+void sbprgdef(void)
+{
+    while (lookahead == PROCEDURE || lookahead == FUNCTION)
+    {
+        int isfunc = (lookahead == FUNCTION);
+        match(lookahead);
+        match(ID);
+        parmlist();
+        if (isfunc)
+        {
+            match(':');
+            type();
+        }
+        match(':');
+        block();
+        match(';');
+    }
+}
+
+void parmlist(void)
+{
+    if (lookahead == '(')
+    {
+        match('(');
+    _parmlist:
+        if (lookahead == VAR)
+        {
+            match(VAR);
+        }
+        idlist();
+        match(':');
+        type();
+        if (lookahead == ';')
+        {
+            match(';');
+            goto _parmlist;
+        }
+        match(')');
+    }
+}
+
 void idlist(void)
 {
 _idlist:
@@ -23,5 +89,78 @@ _idlist:
     {
         match(',');
         goto _idlist;
+    }
+}
+
+void beginend(void)
+{
+    match(BEGIN);
+    stmtlist();
+}
+
+void stmtlist(void)
+{
+_stmtlist:
+    stmt();
+    if (lookahead == ';')
+    {
+        match(';');
+        goto _stmtlist;
+    }
+}
+
+void stmt(void)
+{
+    switch (lookahead)
+    {
+    case ID:
+        idstmt();
+        break;
+    case BEGIN:
+        beginend();
+        break;
+    case IF:
+        ifstmt();
+        break;
+    case WHILE:
+        whilestmt();
+        break;
+    case REPEAT:
+        repstmt();
+        break;
+    default:;
+    }
+}
+
+void idstmt(void)
+{
+    if (lookahead == ID)
+    {
+        match(ID);
+        if (lookahead == ASGN)
+        {
+            match(ASGN);
+            expr();
+        }
+        else
+        {
+            exprlist();
+        }
+    }
+}
+
+void exprlist(void)
+{
+    if (lookahead == '(')
+    {
+        match('(');
+    _exprlist:
+        expr();
+        if (lookahead == ',')
+        {
+            match(',');
+            goto _exprlist;
+        }
+        match(')');
     }
 }
