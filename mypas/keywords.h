@@ -1,24 +1,24 @@
-#include <string.h>
-
-enum {
-    BEGIN = 0X10000,
+enum
+{
+    BEGIN = 0x10000,
+    END,
     PROGRAM,
-    END
+    VAR,
+    IF,
+    WHILE,
+    REPEAT,
+    PROCEDURE,
+    FUNCTION,
+    THEN,
+    ELSE,
+    DO,
+    UNTIL,
+    IN,
+    OR,
+    DIV,
+    MOD,
+    AND,
+    NOT
 };
 
-extern char *keywords[];
-
-char *keywords[] = {
-    "begin",
-    "program",
-    "end"
-}
-
-int iskeyword(char *word) {
-    for (int i = BEGIN; i <= END; i++) {
-        if (strcmp(word, keyword[i - BEGIN])) {
-            return i;
-        }
-    }
-    return 0;
-}
+extern char *keyword[];
