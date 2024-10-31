@@ -305,3 +305,4 @@ int getToken(FILE *source)
     token = getc(source);
     return token;
 }
+

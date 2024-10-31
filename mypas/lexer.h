@@ -13,7 +13,8 @@ enum
     NUM,
     ASGN, // ASGN = ":=",
     FLT,  
-    EXP
+    EXP,
+    UC
 };
 
 extern int linenum;
