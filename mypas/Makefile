@@ -9,4 +9,4 @@ clean:
 	$(RM) *.o
 	
 mostlyclean: clean
-	$(RM) *~ mypas 
+	$(RM) *~ mypas
