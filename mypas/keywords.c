@@ -23,7 +23,7 @@ char *keyword[] = {
     "not"
 };
 
-int isKeyWord(char *word)
+int iskeyword(char *word)
 {
     for (int i = BEGIN; i <= END; i++)
     {

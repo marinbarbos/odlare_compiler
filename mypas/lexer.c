@@ -94,7 +94,7 @@ int isDEC(FILE *tape)
     return 0;
 }
 
-void skipSpaces(FILE *tape)
+void skipspaces(FILE *tape)
 {
     int head;
 
@@ -284,10 +284,10 @@ int isFLT(FILE *tape)
     return 0;
 }
 
-int getToken(FILE *source)
+int gettoken(FILE *source)
 {
     int token;
-    skipSpaces(source);
+    skipspaces(source);
 
     // if ((token = isHEX(source)))
     //     return token;

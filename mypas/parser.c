@@ -10,7 +10,7 @@ void program(void)
     match(PROGRAM);
     match(ID);
     match('(');
-    idList();
+    idlist();
     match(')');
     match(';');
     block();
@@ -21,7 +21,7 @@ void block(void)
 {
     vardef();
     sbprgdef();
-    beginEnd();
+    beginend();
     match('.');
 }
 
@@ -30,7 +30,7 @@ void vardef(void)
     if (lookahead == VAR)
         match(VAR);
 _idlist:
-    idList();
+    idlist();
     match(':');
     type();
     match(';');
@@ -38,7 +38,7 @@ _idlist:
         goto _idlist;
 }
 
-void idList(void)
+void idlist(void)
 {
 _idlist:
     match(ID);
@@ -49,14 +49,14 @@ _idlist:
     }
 }
 
-void beginEnd(void)
+void beginend(void)
 {
     match(BEGIN);
-    stmtList();
+    stmtlist();
     match(END);
 }
 
-void stmtList(void)
+void stmtlist(void)
 {
 _stmtlist:
     stmt();
@@ -72,26 +72,26 @@ void stmt(void)
     switch (lookahead)
     {
     case ID:
-        idStmt();
+        idstmt();
         break;
     case BEGIN:
-        beginEnd();
+        beginend();
         break;
     case IF:
-        ifStmt();
+        ifstmt();
         break;
     case WHILE:
-        whileStmt();
+        whilestmt();
         break;
     case REPEAT:
-        repeatStmt();
+        repeatstmt();
         break;
     default:
         break;
     }
 }
 
-void idStmt(void)
+void idstmt(void)
 {
     if (lookahead == ID)
     {
@@ -103,22 +103,22 @@ void idStmt(void)
         }
         else
         {
-            exprList();
+            exprlist();
         }
     }
 }
 
-void exprList(void)
+void exprlist(void)
 {
     if (lookahead == '(')
     {
         match('(');
-    _exprList:
+    _exprlist:
         expr();
         if (lookahead == ',')
         {
             match(',');
-            goto _exprList;
+            goto _exprlist;
         }
         match(')');
     }
@@ -128,11 +128,11 @@ void sbrgdef(void)
 {
     while (lookahead == PROCEDURE || lookahead == FUNCTION)
     {
-        int isFunc = (lookahead == FUNCTION);
+        int isfunc = (lookahead == FUNCTION);
         match(lookahead);
         match(ID);
-        parmList();
-        if (isFunc)
+        parmlist();
+        if (isfunc)
         {
             match(':');
             type();
@@ -143,30 +143,30 @@ void sbrgdef(void)
     }
 }
 
-void parmList(void)
+void parmlist(void)
 {
     if (lookahead == '(')
     {
         match('(');
-    _parmList:
+    _parmlist:
         if (lookahead == VAR)
         {
             match(VAR);
         }
 
-        idList();
+        idlist();
         match(':');
         type();
         if (lookahead == ';')
         {
             match(';');
-            goto _parmList;
+            goto _parmlist;
         }
         match(')');
     }
 }
 
-void ifStmt(void)
+void ifstmt(void)
 {
     if (lookahead == IF)
     {
@@ -181,7 +181,7 @@ void ifStmt(void)
     }
 }
 
-void whileStmt(void)
+void whilestmt(void)
 {
     if (lookahead == WHILE)
     {
@@ -192,12 +192,12 @@ void whileStmt(void)
     }
 }
 
-void repeatStmt(void)
+void repeatstmt(void)
 {
     if (lookahead == REPEAT)
     {
         match(REPEAT);
-        stmtList();
+        stmtlist();
         match(UNTIL);
         expr();
     }
@@ -205,34 +205,34 @@ void repeatStmt(void)
 
 void expr(void)
 {
-    simpleExpr();
+    simpleexpr();
     if (lookahead == IN)
     {
         match(IN);
-        simpleExpr();
+        simpleexpr();
     }
     else
     {
         match(lookahead);
-        simpleExpr();
+        simpleexpr();
     }
 }
 
-void simpleExpr(void)
+void simpleexpr(void)
 {
     if (lookahead == '+' || lookahead == '-')
         match(lookahead);
-_simpleExpr:
+_simpleexpr:
     term();
     if (lookahead == '+' || lookahead == '-')
     {
         match(lookahead);
-        goto _simpleExpr;
+        goto _simpleexpr;
     }
     else if (lookahead == OR)
     {
         match(OR);
-        goto _simpleExpr;
+        goto _simpleexpr;
     }
 }
 
@@ -290,7 +290,7 @@ void factor(void)
         break;
     case '[':
         match('[');
-        exprList();
+        exprlist();
         match(']');
         break;
     default:
@@ -302,7 +302,7 @@ void match(int expected)
 {
     if (lookahead == expected)
     {
-        lookahead = getToken(source);
+        lookahead = gettoken(source);
     }
     else
     {
