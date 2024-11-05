@@ -3,7 +3,6 @@
 
 char *keyword[] = {
     "begin",
-    "end",
     "program",
     "var",
     "if",
@@ -11,6 +10,11 @@ char *keyword[] = {
     "repeat",
     "procedure",
     "function",
+    "integer",
+    "real",
+    "double",
+    "word",
+    "char",
     "then",
     "else",
     "do",
@@ -20,8 +24,8 @@ char *keyword[] = {
     "div",
     "mod",
     "and",
-    "not"
-};
+    "not",
+    "end"};
 
 int iskeyword(char *word)
 {

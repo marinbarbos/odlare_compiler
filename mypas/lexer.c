@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <lexer.h>
 #include <string.h>
+#include <keywords.h>
 
 char lexeme[MAXIDLEN + 1];
 
@@ -47,6 +48,9 @@ int isID(FILE *tape)
         }
         ungetc(lexeme[i], tape);
         lexeme[i] = 0;
+
+        if (i = iskeyword(lexeme))
+            return i;
 
         if (strcmp(lexeme, "exit") == 0)
             return EXIT;
@@ -98,7 +102,8 @@ void skipspaces(FILE *tape)
 {
     int head;
 
-    // Ignora espaços e conta a quantidade de linhas.
+// Ignora espaços e conta a quantidade de linhas.
+_skipspaces:
     while (isspace(head = getc(tape)))
         if (head == '\n')
             linenum++;
@@ -190,6 +195,35 @@ int isNUM(FILE *tape)
     }
 
     ungetc(aux, tape);
+    return 0;
+}
+
+int isRELOP(FILE *tape)
+{
+    switch (lexeme[0] = getc(tape))
+    {
+    case '<':
+        if (lexeme[1] == '=')
+        {
+            lexeme[2] = 0;
+            return LEQ;
+        }
+        if (lexeme[1] == '>')
+        {
+            lexeme[2] = 0;
+            return NEQ;
+        }
+        return LT;
+    case '>':
+        if (lexeme[1] == '=')
+        {
+            lexeme[2] = 0;
+            return GEQ;
+        }
+        return GT;
+    }
+    ungetc(lexeme[0], tape);
+    lexeme[0] = 0;
     return 0;
 }
 
@@ -305,4 +339,3 @@ int gettoken(FILE *source)
     token = getc(source);
     return token;
 }
-

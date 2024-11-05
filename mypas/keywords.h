@@ -1,7 +1,6 @@
 enum
 {
     BEGIN = 0x10000,
-    END,
     PROGRAM,
     VAR,
     IF,
@@ -9,6 +8,11 @@ enum
     REPEAT,
     PROCEDURE,
     FUNCTION,
+    INTEGER,
+    REAL,
+    DOUBLE,
+    WORD,
+    CHAR,
     THEN,
     ELSE,
     DO,
@@ -18,7 +22,8 @@ enum
     DIV,
     MOD,
     AND,
-    NOT
+    NOT,
+    END,
 };
 
 extern char *keyword[];
