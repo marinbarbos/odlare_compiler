@@ -132,6 +132,19 @@ void stmt(void)
     }
 }
 
+void ifstmt(void)
+{
+    if (lookahead == IF)
+    match(IF);
+    expr();
+    stmt();
+    if (lookahead == ELSE)
+    {
+        match(ELSE);
+        stmt();
+    }
+}
+
 void idstmt(void)
 {
     if (lookahead == ID)
@@ -146,6 +159,28 @@ void idstmt(void)
         {
             exprlist();
         }
+    }
+}
+
+void expr(void)
+{
+    switch(lookahead) {
+        case '<':
+            if()
+            match('<');
+            break;
+        case '>':
+            match('>');
+            break;
+        case '=':
+            match('=');
+            break;
+        case IN:
+            match(IN);
+            break;
+
+        default:
+            break;
     }
 }
 
