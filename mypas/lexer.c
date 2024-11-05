@@ -54,6 +54,8 @@ int isID(FILE *tape)
         if (strcmp(lexeme, "quit") == 0)
             return QUIT;
 
+        if(i = iskeyword(lexeme)) return i;
+        
         return ID;
     }
 
@@ -94,87 +96,46 @@ int isDEC(FILE *tape)
     return 0;
 }
 
+int isRELOP(FILE* tape) {
+    switch (lexeme[0] = getc(tape))
+    {
+    case '<':
+        if (lexeme[1] == '=') {
+            lexeme[2] = 0;
+            return LEQ;
+        }
+        if (lexeme[1] == '>') {
+            lexeme[2] = 0;
+            return NEQ;
+        }
+        return LT;
+    case '>':
+        if (lexeme[1] == '=') {
+            lexeme[2] = 0;
+            return GEQ;
+        }
+        return GT;
+    }
+    ungetc(lexeme[0], tape);
+    lexeme[0] = 0;
+    return 0;
+}
+
 void skipspaces(FILE *tape)
 {
     int head;
 
     // Ignora espaços e conta a quantidade de linhas.
+_skipspaces:
     while (isspace(head = getc(tape)))
         if (head == '\n')
             linenum++;
+    // skip comments {}
+    if (head == '{')
+        while (!((head = getc(tape)) == '}'));
+    goto _skipspaces;
 
     ungetc(head, tape);
-}
-
-// 1. Apresente uma expressão regular para definir números octais. O número 0 é octal? Justifique sua resposta.
-// OCT = 0[0-7]*
-// 012345670
-// 0012
-int isOCT(FILE *tape)
-{
-    int i = 0;
-    lexeme[i] = getc(tape);
-    // Verifica se há uma sequência de dígitos prefixados por um 0 e seguidos de um ou mais dígitos não maiores do que 7.
-    if (lexeme[i] == '0')
-    {
-        i = 1;
-        while (isdigit(lexeme[i] = getc(tape)))
-        {
-            // Caso o caracter recebido seja maior do que 7 é necessário devolver lexeme encontrado e o prefixo 0.
-            if (lexeme[i] > '7')
-            {
-                ungetc(lexeme[i], tape);
-                ungetc('0', tape);
-                i--;
-                lexeme[i] = 0;
-                return 0;
-            }
-
-            i++;
-        }
-        ungetc(lexeme[i], tape);
-        lexeme[i] = 0;
-        return OCT;
-    }
-
-    ungetc(lexeme[i], tape);
-    lexeme[i] = 0;
-    return 0;
-}
-
-// 5. Análogo ao Exercício 2, implemente uma função predicado, int isHEX(FILE *tape), para decidir se uma cadeia, oriunda de tape, é ou não um hexadecimal.
-// HEX = 0[xX][0-9A-F]+
-// 0xFF
-// 0x112
-int isHEX(FILE *tape)
-{
-    int i = 0;
-    lexeme[i] = getc(tape);
-
-    // Verifica se há uma sequência de letras e/ou dígitos decimais prefixados por um 0x e se letra não maior que F.
-    if (isdigit(lexeme[i]))
-    {
-        i = 1;
-        if (lexeme[i] == '0' && (toupper(lexeme[i] = getc(tape)) == 'X'))
-        {
-            do
-            {
-                if (!(isalnum(lexeme[i] = getc(tape))) || lexeme[i] > 'F')
-                {
-                    ungetc(lexeme[i], tape);
-                    lexeme[i] = 0;
-                    return 0;
-                }
-            } while (isalnum(lexeme[i] = getc(tape)));
-
-            ungetc(lexeme[i], tape);
-            lexeme[i] = 0;
-            return HEX;
-        }
-    }
-    ungetc(lexeme[i], tape);
-    lexeme[i] = 0;
-    return 0;
 }
 
 int isNUM(FILE *tape)
@@ -284,25 +245,23 @@ int isFLT(FILE *tape)
     return 0;
 }
 
-int gettoken(FILE *source)
+int gettoken(FILE *src)
 {
     int token;
-    skipspaces(source);
+    skipspaces(src);
 
-    // if ((token = isHEX(source)))
-    //     return token;
-    if ((token = isID(source)))
+    if ((token = isID(src)))
         return token;
-    // if ((token = isOCT(source)))
-    //     return token;
-    if ((token = isNUM(source)))
+    if ((token = isNUM(src)))
         return token;
-    // if ((token = isDEC(source)))
-    //     return token;
-    if ((token = isASGN(source)))
+    if ((token = isASGN(src)))
+        return token;
+    if ((token = isRELOP(src)))
+        return token;
+    if ((token = isDEC(src)))
         return token;
 
-    token = getc(source);
+    token = getc(src);
     return token;
 }
 

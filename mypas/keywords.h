@@ -1,7 +1,6 @@
 enum
 {
-    BEGIN = 0x10000,
-    END,
+    BEGIN = 0x1000000,
     PROGRAM,
     VAR,
     IF,
@@ -18,7 +17,14 @@ enum
     DIV,
     MOD,
     AND,
-    NOT
+    NOT,
+    INTEGER,
+    REAL,
+    DOUBLE,
+    BOOLEAN,
+    END,
 };
 
 extern char *keyword[];
+
+int iskeyword(char*);

@@ -93,18 +93,12 @@ void stmt(void)
 
 void idstmt(void)
 {
-    if (lookahead == ID)
-    {
-        match(ID);
-        if (lookahead == ASGN)
-        {
-            match(ASGN);
-            expr();
-        }
-        else
-        {
-            exprlist();
-        }
+    match(ID);
+    if (lookahead == ASGN) {
+        match(ASGN);
+        expr();
+    } else {
+        exprlist();
     }
 }
 
@@ -168,39 +162,30 @@ void parmlist(void)
 
 void ifstmt(void)
 {
-    if (lookahead == IF)
-    {
-        match(IF);
-        expr();
-        match(THEN);
-        if (lookahead == ELSE)
-        {
-            match(ELSE);
-            stmt();
-        }
+    match(IF);
+    expr();
+    match(THEN);
+    stmt();
+    if (lookahead == ELSE) {
+        match(ELSE);
+        stmt();
     }
 }
 
 void whilestmt(void)
 {
-    if (lookahead == WHILE)
-    {
-        match(WHILE);
-        expr();
-        match(DO);
-        stmt();
-    }
+    match(WHILE);
+    expr();
+    match(DO);
+    stmt();
 }
 
 void repeatstmt(void)
 {
-    if (lookahead == REPEAT)
-    {
-        match(REPEAT);
-        stmtlist();
-        match(UNTIL);
-        expr();
-    }
+    match(REPEAT);
+    stmtlist();
+    match(UNTIL);
+    expr();
 }
 
 void expr(void)
@@ -298,15 +283,30 @@ void factor(void)
     }
 }
 
+void type(void)
+{
+    switch (lookahead)
+    {
+    case INTEGER:
+    case REAL:
+    case DOUBLE:
+        match(lookahead);
+        break;
+    default:
+        match(BOOLEAN);
+        break;
+    }
+}
+
 void match(int expected)
 {
     if (lookahead == expected)
     {
-        lookahead = gettoken(source);
+        lookahead = gettoken(src);
     }
     else
     {
-        fprintf(stderr, "token mismatch\n");
+        fprintf(stderr, "syntax error at line %d\n", linenum);
         exit(-3);
     }
 }

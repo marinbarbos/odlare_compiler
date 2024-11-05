@@ -3,7 +3,6 @@
 
 char *keyword[] = {
     "begin",
-    "end",
     "program",
     "var",
     "if",
@@ -20,12 +19,17 @@ char *keyword[] = {
     "div",
     "mod",
     "and",
-    "not"
+    "not",
+    "integer",
+    "real",
+    "double",
+    "boolean",
+    "end",
 };
 
 int iskeyword(char *word)
 {
-    for (int i = BEGIN; i <= END; i++)
+    for (int i = BEGIN; i <= END; i++) // end precisa ficar no final por causa disso
     {
         if (strcmp(word, keyword[i - BEGIN]))
         {

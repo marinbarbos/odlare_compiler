@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <keywords.h>
 
 #define MAXIDLEN 32
 
@@ -14,7 +15,12 @@ enum
     ASGN, // ASGN = ":=",
     FLT,  
     EXP,
-    UC
+    UC,
+    LEQ,
+    NEQ,
+    GEQ,
+    LT, // less than
+    GT, // greater than
 };
 
 extern int linenum;
