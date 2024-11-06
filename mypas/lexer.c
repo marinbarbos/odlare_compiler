@@ -127,13 +127,24 @@ void skipspaces(FILE *tape)
 
     // Ignora espaços e conta a quantidade de linhas.
 _skipspaces:
-    while (isspace(head = getc(tape)))
-        if (head == '\n')
+    while (isspace(head = getc(tape))) {
+        if (head == '\n') {
             linenum++;
+        }
+    }
     // skip comments {}
-    if (head == '{')
-        while (!((head = getc(tape)) == '}'));
-    goto _skipspaces;
+    if (head == '{') {
+        while (!((head = getc(tape)) == '}')) {
+            if (head == '\n') {
+                linenum++;
+            }
+            if (head == EOF) {
+                ungetc(head, tape);
+                break;
+            }
+        }
+        goto _skipspaces;
+    }
 
     ungetc(head, tape);
 }
