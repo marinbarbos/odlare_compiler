@@ -5,6 +5,8 @@
 #include <parser.h>
 #include <keywords.h>
 
+int lookahead;
+
 void program(void)
 {
     match(PROGRAM);
@@ -118,7 +120,7 @@ void exprlist(void)
     }
 }
 
-void sbrgdef(void)
+void sbprgdef(void)
 {
     while (lookahead == PROCEDURE || lookahead == FUNCTION)
     {
@@ -256,14 +258,14 @@ void factor(void)
 {
     switch (lookahead)
     {
-    case UC:
-        uc();
-        break;
+    // case UC:
+    //     uc();
+    //     break;
     case VAR:
         vardef();
         break;
     case FUNCTION:
-        sbrgdef();
+        sbprgdef();
         break;
     case '(':
         match('(');
@@ -309,4 +311,13 @@ void match(int expected)
         fprintf(stderr, "syntax error at line %d\n", linenum);
         exit(-3);
     }
+}
+
+void mypas(void)
+{
+    while (lookahead == ';' || lookahead == '\n')
+    {
+        match(lookahead);
+    }
+    match(EOF);
 }

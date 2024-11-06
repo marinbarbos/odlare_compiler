@@ -1,3 +1,6 @@
 mybc/mybc
+mypas/mypas
 *.o
 settings.json
+parser.c~
+*.md
