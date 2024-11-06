@@ -1,5 +1,3 @@
-#pragma once
-
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -26,7 +24,7 @@ void stmtlist(void);
 void stmt(void);
 void idstmt(void);
 void exprlist(void);
-void sbrgdef(void);
+void sbprgdef(void);
 void parmlist(void);
 void ifstmt(void);
 void whilestmt(void);
@@ -38,3 +36,4 @@ void factor(void);
 void match(int);
 
 extern int gettoken(FILE*);
+extern void mypas();

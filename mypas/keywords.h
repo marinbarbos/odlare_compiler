@@ -1,3 +1,5 @@
+#pragma once
+
 enum
 {
     BEGIN = 0x1000000,
