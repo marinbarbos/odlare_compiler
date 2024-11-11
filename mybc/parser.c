@@ -160,23 +160,27 @@ _F:
     F();
 
     /*4*/
-    switch (otimes)
+    if (otimes)
     {
-    case '*':
-    {
-        // printf("\tmul stack[sp], acc\n", otimes);
-        pilha[sp] = pilha[sp] * acc;
-        break;
+        switch (otimes)
+        {
+        case '*':
+        {
+            // printf("\tmul stack[sp], acc\n", otimes);
+            pilha[sp] = pilha[sp] * acc;
+            break;
+        }
+        case '/':
+        {
+            // printf("\tdiv stack[sp], acc\n", otimes);
+            pilha[sp] = pilha[sp] / acc;
+            break;
+        }
+        }
+        printf("\tpop acc\n");
+        acc = pop();
+        otimes = 0;
     }
-    case '/':
-    {
-        // printf("\tdiv stack[sp], acc\n", otimes);
-        pilha[sp] = pilha[sp] / acc;
-        break;
-    }
-    }
-    acc = pop();
-    otimes = 0;
     /*4*/
 
     if (lookahead == '*' || lookahead == '/')
@@ -220,7 +224,6 @@ void F(void)
     case NUM:
         acc = strtod(lexeme, NULL);
         /*4*/ printf("\tnummov %s, acc\n", lexeme); /*4*/
-        push(acc);
         match(NUM);
         break;
     case ASGN:
