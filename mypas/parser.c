@@ -4,8 +4,11 @@
 #include <lexer.h>
 #include <parser.h>
 #include <keywords.h>
+#include <symtab.h>
 
 int lookahead;
+int lexlevel = 1;
+int error_count = 0;
 
 void program(void)
 {
@@ -30,19 +33,28 @@ void block(void)
 void vardef(void)
 {
     if (lookahead == VAR)
+    {
         match(VAR);
-_idlist:
-    idlist();
-    match(':');
-    type();
-    match(';');
-    if (lookahead == ID)
-        goto _idlist;
+    _idlist:
+        idlist();
+        match(':');
+        type();
+        match(';');
+        if (lookahead == ID)
+            goto _idlist;
+    }
 }
 
 void idlist(void)
 {
+    int error_stat = 0;
 _idlist:
+    error_stat = symtab_append(lexeme, lexlevel);
+    if (error_stat)
+    {
+        fprintf(stderr, "FALTAL ERROR: symbol already defined\n");
+        error_count++;
+    }
     match(ID);
     if (lookahead == ',')
     {
@@ -95,11 +107,22 @@ void stmt(void)
 
 void idstmt(void)
 {
+    int id_position = symtab_lookup(lexeme, lexlevel);
+
+    if (id_position < 0)
+    {
+        fprintf(stderr, "FATAL ERROR: symbol not defined\n");
+        error_count++;
+    }
+
     match(ID);
-    if (lookahead == ASGN) {
+    if (lookahead == ASGN)
+    {
         match(ASGN);
         expr();
-    } else {
+    }
+    else
+    {
         exprlist();
     }
 }
@@ -134,8 +157,10 @@ void sbprgdef(void)
             type();
         }
         match(';');
+        lexlevel++; // Incrementa nível léxico
         block();
         match(';');
+        lexlevel--; // Decrementa nível léxico
     }
 }
 
@@ -168,7 +193,8 @@ void ifstmt(void)
     expr();
     match(THEN);
     stmt();
-    if (lookahead == ELSE) {
+    if (lookahead == ELSE)
+    {
         match(ELSE);
         stmt();
     }
@@ -192,20 +218,32 @@ void repeatstmt(void)
 
 void expr(void)
 {
-    simpleexpr();
-    if (lookahead == IN)
-    {
-        match(IN);
-        simpleexpr();
-    }
-    else
+    smpexpr();
+
+    if (relop())
     {
         match(lookahead);
-        simpleexpr();
+        smpexpr();
     }
 }
 
-void simpleexpr(void)
+int relop()
+{
+    switch (lookahead)
+    {
+    case '>':
+    case GEQ:
+    case '<':
+    case LEQ:
+    case NEQ:
+    case '=':
+        return (lookahead);
+    }
+
+    return 0;
+}
+
+void smpexpr(void)
 {
     if (lookahead == '+' || lookahead == '-')
         match(lookahead);
