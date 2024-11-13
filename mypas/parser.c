@@ -4,6 +4,11 @@
 #include <lexer.h>
 #include <parser.h>
 #include <keywords.h>
+#include <symtab.h>
+
+int lexlevel = 1;
+
+int error_count = 0;
 
 int lookahead;
 
@@ -39,10 +44,16 @@ _idlist:
     if (lookahead == ID)
         goto _idlist;
 }
-
 void idlist(void)
 {
+    int error_stat = 0;
 _idlist:
+    error_stat = symtab_append(lexeme, lexlevel);
+    if (error_stat)
+    {
+        fprintf(stderr, "FATAL_ERROR: symbol already defined: %s\n", lexeme);
+        error_count++;
+    }
     match(ID);
     if (lookahead == ',')
     {
@@ -95,11 +106,20 @@ void stmt(void)
 
 void idstmt(void)
 {
+    int id_position = symtab_lookup(lexeme);
+    if (id_position < 0)
+    {
+        fprintf(stderr, "FATAL_ERROR: symbol not defined\n");
+        error_count++;
+    }
     match(ID);
-    if (lookahead == ASGN) {
+    if (lookahead == ASGN)
+    {
         match(ASGN);
         expr();
-    } else {
+    }
+    else
+    {
         exprlist();
     }
 }
@@ -134,8 +154,10 @@ void sbprgdef(void)
             type();
         }
         match(';');
+        lexlevel++; // increase lexical level
         block();
         match(';');
+        lexlevel--; // decrease lexical level
     }
 }
 
@@ -168,7 +190,8 @@ void ifstmt(void)
     expr();
     match(THEN);
     stmt();
-    if (lookahead == ELSE) {
+    if (lookahead == ELSE)
+    {
         match(ELSE);
         stmt();
     }
@@ -190,19 +213,38 @@ void repeatstmt(void)
     expr();
 }
 
+int relop(void)
+{
+    switch (lookahead)
+    {
+    case '>':
+    case GEQ:
+    case '<':
+    case LEQ:
+    case NEQ:
+    case '=':
+        return lookahead;
+    }
+    return 0;
+}
 void expr(void)
 {
     simpleexpr();
-    if (lookahead == IN)
-    {
-        match(IN);
-        simpleexpr();
-    }
-    else
+    if (relop())
     {
         match(lookahead);
         simpleexpr();
     }
+    // if (lookahead == IN)
+    // {
+    //     match(IN);
+    //     simpleexpr();
+    // }
+    // else
+    // {
+    //     match(lookahead);
+    //     simpleexpr();
+    // }
 }
 
 void simpleexpr(void)
@@ -258,9 +300,6 @@ void factor(void)
 {
     switch (lookahead)
     {
-    // case UC:
-    //     uc();
-    //     break;
     case VAR:
         vardef();
         break;
