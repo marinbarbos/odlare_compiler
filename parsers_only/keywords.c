@@ -1,6 +1,6 @@
 #include <keywords.h>
 #include <string.h>
-#include <stdio.h>
+
 char *keyword[] = {
     "begin",
     "program",
@@ -31,11 +31,9 @@ int iskeyword(char *word)
 {
     for (int i = BEGIN; i <= END; i++) // end precisa ficar no final por causa disso
     {
-        if (strcmp(word, keyword[i - BEGIN]) == 0)
+        if (strcmp(word, keyword[i - BEGIN]))
         {
             return i;
         }
     }
-
-    return 0;
 }

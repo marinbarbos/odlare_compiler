@@ -1,18 +1,20 @@
-#include <stdio.h>
-#include <stdlib.h>
+#include <mypas.h>
 #include <string.h>
 #include <lexer.h>
 #include <parser.h>
 #include <keywords.h>
+#include <symtab.h>
 
 int lookahead;
+int lexlevel = 1;
+int error_count = 0;
 
 void program(void)
 {
     match(PROGRAM);
     match(ID);
     match('(');
-    idlist();
+    idlist(lexlevel + 1);
     match(')');
     match(';');
     block();
@@ -30,25 +32,50 @@ void block(void)
 void vardef(void)
 {
     if (lookahead == VAR)
+    {
         match(VAR);
-_idlist:
-    idlist();
-    match(':');
-    type();
-    match(';');
-    if (lookahead == ID)
-        goto _idlist;
+    _idlist:
+        idlist(lexlevel + 1);
+        match(':');
+        type();
+        match(';');
+        if (lookahead == ID)
+            goto _idlist;
+    }
 }
 
-void idlist(void)
+void idlist(int localLexLevel)
 {
+    int error_stat = 0;
 _idlist:
+    error_stat = symtab_append(lexeme, localLexLevel);
+    if (error_stat)
+    {
+        fprintf(stderr, "FALTAL ERROR: symbol already defined\n");
+        error_count++;
+    }
     match(ID);
     if (lookahead == ',')
     {
         match(',');
         goto _idlist;
     }
+}
+
+int relop()
+{
+    switch (lookahead)
+    {
+    case '>':
+    case GEQ:
+    case '<':
+    case LEQ:
+    case NEQ:
+    case '=':
+        return (lookahead);
+    }
+
+    return 0;
 }
 
 void beginend(void)
@@ -71,6 +98,8 @@ _stmtlist:
 
 void stmt(void)
 {
+        fprintf(stderr,"ENTROU stmt: \n");
+
     switch (lookahead)
     {
     case ID:
@@ -95,11 +124,23 @@ void stmt(void)
 
 void idstmt(void)
 {
+    int id_position = symtab_lookup(lexeme, lexlevel);
+
+    if (id_position < 0)
+    {
+        fprintf(stderr, "FATAL ERROR: symbol not defined\n");
+        error_count++;
+    }
+        fprintf(stderr,"ID TABELA SYMBOL: %d\n", id_position);
+
     match(ID);
-    if (lookahead == ASGN) {
+    if (lookahead == ASGN)
+    {
         match(ASGN);
         expr();
-    } else {
+    }
+    else
+    {
         exprlist();
     }
 }
@@ -122,20 +163,35 @@ void exprlist(void)
 
 void sbprgdef(void)
 {
+    int local_init_position, error_start;
+
     while (lookahead == PROCEDURE || lookahead == FUNCTION)
     {
         int isfunc = (lookahead == FUNCTION);
         match(lookahead);
+        error_start = symtab_append(lexeme, lexlevel);
+
+        if (error_start)
+        {
+            fprintf(stderr, "FATAL ERROR: already defined\n");
+            error_count++;
+        }
+
         match(ID);
-        parmlist();
+        local_init_position = symtab_next_entry;
+        parmlist(); // lexlevel + 1
+
         if (isfunc)
         {
             match(':');
             type();
         }
+
         match(';');
+        lexlevel++; // Incrementa nível léxico
         block();
         match(';');
+        lexlevel--; // Decrementa nível léxico
     }
 }
 
@@ -150,7 +206,7 @@ void parmlist(void)
             match(VAR);
         }
 
-        idlist();
+        idlist(lexlevel + 1);
         match(':');
         type();
         if (lookahead == ';')
@@ -168,7 +224,8 @@ void ifstmt(void)
     expr();
     match(THEN);
     stmt();
-    if (lookahead == ELSE) {
+    if (lookahead == ELSE)
+    {
         match(ELSE);
         stmt();
     }
@@ -190,36 +247,27 @@ void repeatstmt(void)
     expr();
 }
 
-void expr(void)
-{
-    simpleexpr();
-    if (lookahead == IN)
-    {
-        match(IN);
-        simpleexpr();
-    }
-    else
-    {
-        match(lookahead);
-        simpleexpr();
-    }
-}
-
-void simpleexpr(void)
+void smpexpr(void)
 {
     if (lookahead == '+' || lookahead == '-')
         match(lookahead);
 _simpleexpr:
     term();
-    if (lookahead == '+' || lookahead == '-')
+    if (lookahead == '+' || lookahead == '-' || lookahead == OR)
     {
         match(lookahead);
         goto _simpleexpr;
     }
-    else if (lookahead == OR)
+}
+
+void expr(void)
+{
+    smpexpr();
+
+    if (relop())
     {
-        match(OR);
-        goto _simpleexpr;
+        match(lookahead);
+        smpexpr();
     }
 }
 
@@ -230,23 +278,11 @@ _term:
     switch (lookahead)
     {
     case '*':
-        match('*');
-        goto _term;
-        break;
     case '/':
-        match('/');
-        goto _term;
-        break;
     case DIV:
-        match(DIV);
-        goto _term;
-        break;
     case MOD:
-        match(MOD);
-        goto _term;
-        break;
     case AND:
-        match(AND);
+        match(lookahead);
         goto _term;
         break;
     default:
@@ -302,6 +338,7 @@ void type(void)
 
 void match(int expected)
 {
+    fprintf(stderr, "%d | %d\n", lookahead, expected);
     if (lookahead == expected)
     {
         lookahead = gettoken(src);
@@ -313,11 +350,35 @@ void match(int expected)
     }
 }
 
+void cmd(void)
+{
+    // double result;
+    switch (lookahead)
+    {
+    case ';':
+    case '\n':
+    case EOF:
+        /* do nothing */
+        break;
+
+    case QUIT:
+        exit(0);
+    case EXIT:
+        exit(0);
+
+    default:
+        program();
+    }
+}
+
 void mypas(void)
 {
+    cmd();
     while (lookahead == ';' || lookahead == '\n')
     {
         match(lookahead);
+        cmd();
     }
     match(EOF);
 }
+
