@@ -47,7 +47,7 @@ int isID(FILE *tape)
         }
         ungetc(lexeme[i], tape);
         lexeme[i] = 0;
-        fprintf(stderr,"lexeme: %s\n", lexeme);
+        fprintf(stderr, "lexeme: %s\n", lexeme);
 
         if (strcmp(lexeme, "exit") == 0)
             return EXIT;
@@ -55,8 +55,9 @@ int isID(FILE *tape)
         if (strcmp(lexeme, "quit") == 0)
             return QUIT;
 
-        if(i = iskeyword(lexeme)) {
-            fprintf(stderr,"keyword: %d\n", i);
+        if (i = iskeyword(lexeme))
+        {
+            fprintf(stderr, "keyword: %d\n", i);
 
             return i;
         }
@@ -100,26 +101,34 @@ int isDEC(FILE *tape)
     return 0;
 }
 
-int isRELOP(FILE* tape) {
+int isRELOP(FILE *tape)
+{
     switch (lexeme[0] = getc(tape))
     {
     case '<':
-        if (lexeme[1] == '=') {
-            lexeme[2] = 0;
+        if ((lexeme[1] = getc(tape)) == '=')
+        {
             return LEQ;
         }
-        if (lexeme[1] == '>') {
-            lexeme[2] = 0;
+        if (lexeme[1] == '>')
+        {
             return NEQ;
         }
+        ungetc(lexeme[1], tape);
         return LT;
     case '>':
-        if (lexeme[1] == '=') {
-            lexeme[2] = 0;
+        if ((lexeme[1] = getc(tape)) == '=')
+        {
             return GEQ;
         }
+        ungetc(lexeme[1], tape);
         return GT;
-    }
+    case '=':
+        ungetc(lexeme[1], tape);
+        return EQ;
+        break;
+    };
+
     ungetc(lexeme[0], tape);
     lexeme[0] = 0;
     return 0;
@@ -131,25 +140,30 @@ void skipspaces(FILE *tape)
 
     // Ignora espaços e conta a quantidade de linhas.
 _skipspaces:
-    while (isspace(head = getc(tape))) {
-        if (head == '\n') {
+    while (isspace(head = getc(tape)))
+    {
+        if (head == '\n')
+        {
             linenum++;
         }
-        fprintf(stderr,"head: %c\n", head);
-
+        fprintf(stderr, "head: %c\n", head);
     }
     // skip comments {}
-    if (head == '{') {
-        while (!((head = getc(tape)) == '}')) {
-            if (head == '\n') {
+    if (head == '{')
+    {
+        while (!((head = getc(tape)) == '}'))
+        {
+            if (head == '\n')
+            {
                 linenum++;
             }
-            if (head == EOF) {
+            if (head == EOF)
+            {
                 ungetc(head, tape);
                 break;
             }
         }
-        
+
         goto _skipspaces;
     }
 
@@ -282,4 +296,3 @@ int gettoken(FILE *src)
     token = getc(src);
     return token;
 }
-

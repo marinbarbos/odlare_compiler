@@ -34,6 +34,6 @@ int main(int argc, char *argv[])
     mypas();
 
     printf("\n%i", lookahead);
-    printf("\nNumero de linhas: %i", linenum);
+    printf("\nNumero de linhas: %i\n", linenum);
     return 0;
 }

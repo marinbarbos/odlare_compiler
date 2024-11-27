@@ -26,7 +26,6 @@ void block(void)
     vardef();
     sbprgdef();
     beginend();
-    match('.');
 }
 
 void vardef(void)
@@ -64,14 +63,15 @@ _idlist:
 
 int relop()
 {
+    fprintf(stderr, "CHEGOU RELOP %d\n", lookahead);
     switch (lookahead)
     {
-    case '>':
+    case GT:
     case GEQ:
-    case '<':
+    case LT:
     case LEQ:
     case NEQ:
-    case '=':
+    case EQ:
         return (lookahead);
     }
 
@@ -98,7 +98,7 @@ _stmtlist:
 
 void stmt(void)
 {
-        fprintf(stderr,"ENTROU stmt: \n");
+    fprintf(stderr, "ENTROU stmt: \n");
 
     switch (lookahead)
     {
@@ -131,7 +131,6 @@ void idstmt(void)
         fprintf(stderr, "FATAL ERROR: symbol not defined\n");
         error_count++;
     }
-        fprintf(stderr,"ID TABELA SYMBOL: %d\n", id_position);
 
     match(ID);
     if (lookahead == ASGN)
@@ -222,8 +221,13 @@ void ifstmt(void)
 {
     match(IF);
     expr();
+    fprintf(stderr, "CHEGOU FIM EXPR\n");
     match(THEN);
+    fprintf(stderr, "CHEGOU FIM match(THEN)\n");
+
     stmt();
+    fprintf(stderr, "CHEGOU FIM stmt\n");
+
     if (lookahead == ELSE)
     {
         match(ELSE);
@@ -256,7 +260,8 @@ _simpleexpr:
     if (lookahead == '+' || lookahead == '-' || lookahead == OR)
     {
         match(lookahead);
-        goto _simpleexpr;
+        // goto _simpleexpr;
+        term();
     }
 }
 
@@ -294,9 +299,12 @@ void factor(void)
 {
     switch (lookahead)
     {
-    // case UC:
-    //     uc();
-    //     break;
+    case NUM:
+        match(NUM);
+        break;
+    case ID:
+        idstmt();
+        break;
     case VAR:
         vardef();
         break;
@@ -338,7 +346,7 @@ void type(void)
 
 void match(int expected)
 {
-    fprintf(stderr, "%d | %d\n", lookahead, expected);
+    fprintf(stderr, "lookahead: %d | expected: %d\n", lookahead, expected);
     if (lookahead == expected)
     {
         lookahead = gettoken(src);
@@ -381,4 +389,3 @@ void mypas(void)
     }
     match(EOF);
 }
-
