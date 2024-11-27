@@ -21,6 +21,7 @@ enum
     GEQ,
     LT, // less than
     GT, // greater than
+    EQ
 };
 
 extern int linenum;
