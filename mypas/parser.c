@@ -98,7 +98,7 @@ _stmtlist:
 
 void stmt(void)
 {
-        fprintf(stderr,"ENTROU stmt: \n");
+    fprintf(stderr, "ENTROU stmt: \n");
 
     switch (lookahead)
     {
@@ -131,7 +131,7 @@ void idstmt(void)
         fprintf(stderr, "FATAL ERROR: symbol not defined\n");
         error_count++;
     }
-        fprintf(stderr,"ID TABELA SYMBOL: %d\n", id_position);
+    fprintf(stderr, "ID TABELA SYMBOL: %d\n", id_position);
 
     match(ID);
     if (lookahead == ASGN)
@@ -381,4 +381,3 @@ void mypas(void)
     }
     match(EOF);
 }
-
