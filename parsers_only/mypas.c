@@ -1,10 +1,11 @@
-#include <mypas.h>
+#include <stdio.h>
+#include <stdlib.h>
 #include <parser.h>
 #include <lexer.h>
-#include <libgen.h>
 
 FILE *src;
 
+extern int linenum;
 int main(int argc, char *argv[])
 {
     if (argc == 1)
@@ -17,7 +18,7 @@ int main(int argc, char *argv[])
 
         if (src == NULL)
         {
-            fprintf(stderr, "%s: not found\n", argv[1]);
+            fprintf("%s: not found\n", argv[1]);
             exit(-3);
         }
     }
@@ -26,9 +27,8 @@ int main(int argc, char *argv[])
         fprintf(stderr, "%s: too many paramters\n", argv[0]);
         exit(-4);
     }
-    // src = stdin;
+    src = stdin;
     lookahead = gettoken(src);
-    fprintf(stderr, "%d | \n", lookahead);
 
     // Coração da aplicação
     mypas();

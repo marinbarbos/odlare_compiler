@@ -18,7 +18,7 @@ void program(void); // initial symbol
 void block(void);
 void type(void);
 void vardef(void);
-void idlist(void);
+void idlist(int localLexLevel);
 void beginend(void);
 void stmtlist(void);
 void stmt(void);
