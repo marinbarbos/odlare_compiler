@@ -4,3 +4,4 @@ mypas/mypas
 settings.json
 parser.c~
 *.md
+*.code-workspace
