@@ -1,5 +1,4 @@
 #include <stdio.h>
-
 #define MAXIDLEN 32
 
 enum
@@ -12,7 +11,7 @@ enum
     HEX,
     NUM,
     ASGN, // ASGN = ":=",
-    FLT,  
+    FLT,
     EXP
 };
 

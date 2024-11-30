@@ -54,8 +54,9 @@ int isID(FILE *tape)
         if (strcmp(lexeme, "quit") == 0)
             return QUIT;
 
-        if(i = iskeyword(lexeme)) return i;
-        
+        if (i = iskeyword(lexeme))
+            return i;
+
         return ID;
     }
 
@@ -96,21 +97,25 @@ int isDEC(FILE *tape)
     return 0;
 }
 
-int isRELOP(FILE* tape) {
+int isRELOP(FILE *tape)
+{
     switch (lexeme[0] = getc(tape))
     {
     case '<':
-        if (lexeme[1] == '=') {
+        if (lexeme[1] == '=')
+        {
             lexeme[2] = 0;
             return LEQ;
         }
-        if (lexeme[1] == '>') {
+        if (lexeme[1] == '>')
+        {
             lexeme[2] = 0;
             return NEQ;
         }
         return LT;
     case '>':
-        if (lexeme[1] == '=') {
+        if (lexeme[1] == '=')
+        {
             lexeme[2] = 0;
             return GEQ;
         }
@@ -127,18 +132,24 @@ void skipspaces(FILE *tape)
 
     // Ignora espaços e conta a quantidade de linhas.
 _skipspaces:
-    while (isspace(head = getc(tape))) {
-        if (head == '\n') {
+    while (isspace(head = getc(tape)))
+    {
+        if (head == '\n')
+        {
             linenum++;
         }
     }
     // skip comments {}
-    if (head == '{') {
-        while (!((head = getc(tape)) == '}')) {
-            if (head == '\n') {
+    if (head == '{')
+    {
+        while (!((head = getc(tape)) == '}'))
+        {
+            if (head == '\n')
+            {
                 linenum++;
             }
-            if (head == EOF) {
+            if (head == EOF)
+            {
                 ungetc(head, tape);
                 break;
             }
@@ -275,4 +286,3 @@ int gettoken(FILE *src)
     token = getc(src);
     return token;
 }
-

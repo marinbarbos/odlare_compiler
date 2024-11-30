@@ -35,5 +35,5 @@ void term(void);
 void factor(void);
 void match(int);
 
-extern int gettoken(FILE*);
+extern int gettoken(FILE *);
 extern void mypas();

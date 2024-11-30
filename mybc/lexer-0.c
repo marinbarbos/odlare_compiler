@@ -8,8 +8,10 @@ int isID(FILE *tape)
 {
 	int head = getc(tape);
 
-	if ( isalpha(head) ) {
-		while ( isalnum(head = getc(tape)) );
+	if (isalpha(head))
+	{
+		while (isalnum(head = getc(tape)))
+			;
 		ungetc(head, tape);
 		return ID;
 	}
@@ -25,11 +27,14 @@ int isDEC(FILE *tape)
 {
 	int head = getc(tape);
 
-	if (isdigit(head)) {
-		if (head == '0') {
+	if (isdigit(head))
+	{
+		if (head == '0')
+		{
 			return DEC;
 		}
-		while(isdigit(head = getc(tape)));
+		while (isdigit(head = getc(tape)))
+			;
 		ungetc(head, tape);
 		return DEC;
 	}
@@ -39,7 +44,10 @@ int isDEC(FILE *tape)
 
 int getToken(FILE *source)
 {
-	if (isID(source)) printf("It's an ID\n");
-	else if (isDEC(source)) printf("It's decimal integer\n");
-	else printf("Not ID nor DEC\n");
+	if (isID(source))
+		printf("It's an ID\n");
+	else if (isDEC(source))
+		printf("It's decimal integer\n");
+	else
+		printf("Not ID nor DEC\n");
 }

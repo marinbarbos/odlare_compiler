@@ -18,7 +18,7 @@ int symtab_lookup(char const *lexeme, int lexlevel)
 int symtab_append(char const *lexeme, int lexlevel)
 {
     int elementFound = symtab_lookup(lexeme, lexlevel);
-    
+
     if (elementFound)
         return elementFound;
 
