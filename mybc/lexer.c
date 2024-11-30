@@ -76,7 +76,7 @@ int isID(FILE *tape)
 
         // Verifica se o identificador lido corresponde à palavra-chave "quit"
         if (strcmp(lexeme, "quit") == 0)
-            return QUIT;
+            return EXIT;
 
         // Caso seja apenas um identificador válido, retorna ID
         return ID;
