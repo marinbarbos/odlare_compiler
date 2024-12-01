@@ -267,7 +267,6 @@ void match(int expected)
     else
     {
         fprintf(stderr, "token mismatch\n");
-        // exit(-3);
     }
 }
 
@@ -282,6 +281,8 @@ void cmd(void)
         /* do nothing */
         break;
 
+    /* same behaviour, different enum */
+    case QUIT:
     case EXIT:
         exit(0);
 
