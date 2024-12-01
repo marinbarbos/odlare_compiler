@@ -13,7 +13,5 @@ int main()
     // Coração da aplicação
     mybc();
 
-    printf("\n%i", lookahead);
-    printf("\nNumero de linhas: %i", linenum);
     return 0;
 }
