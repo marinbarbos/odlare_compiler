@@ -47,7 +47,6 @@ int isID(FILE *tape)
         }
         ungetc(lexeme[i], tape);
         lexeme[i] = 0;
-        fprintf(stderr, "lexeme: %s\n", lexeme);
 
         if (strcmp(lexeme, "exit") == 0)
             return EXIT;
@@ -57,8 +56,6 @@ int isID(FILE *tape)
 
         if (i = iskeyword(lexeme))
         {
-            fprintf(stderr, "keyword: %d\n", i);
-
             return i;
         }
         return ID;
@@ -146,7 +143,6 @@ _skipspaces:
         {
             linenum++;
         }
-        fprintf(stderr, "head: %c\n", head);
     }
     // skip comments {}
     if (head == '{')

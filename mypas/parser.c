@@ -63,7 +63,6 @@ _idlist:
 
 int relop()
 {
-    fprintf(stderr, "CHEGOU RELOP %d\n", lookahead);
     switch (lookahead)
     {
     case GT:
@@ -98,8 +97,6 @@ _stmtlist:
 
 void stmt(void)
 {
-    fprintf(stderr, "ENTROU stmt: \n");
-
     switch (lookahead)
     {
     case ID:
@@ -187,9 +184,11 @@ void sbprgdef(void)
         }
 
         match(';');
+        symtab_libera(lexlevel);
         lexlevel++; // Incrementa nível léxico
         block();
         match(';');
+        symtab_libera(lexlevel);
         lexlevel--; // Decrementa nível léxico
     }
 }
@@ -221,12 +220,8 @@ void ifstmt(void)
 {
     match(IF);
     expr();
-    fprintf(stderr, "CHEGOU FIM EXPR\n");
     match(THEN);
-    fprintf(stderr, "CHEGOU FIM match(THEN)\n");
-
     stmt();
-    fprintf(stderr, "CHEGOU FIM stmt\n");
 
     if (lookahead == ELSE)
     {
@@ -346,7 +341,6 @@ void type(void)
 
 void match(int expected)
 {
-    fprintf(stderr, "lookahead: %d | expected: %d\n", lookahead, expected);
     if (lookahead == expected)
     {
         lookahead = gettoken(src);
