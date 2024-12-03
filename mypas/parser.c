@@ -9,6 +9,7 @@ int lookahead;
 int lexlevel = 1;
 int error_count = 0;
 
+// Programa contendo um ID, com parâmetros e um bloco
 void program(void)
 {
     match(PROGRAM);
@@ -21,6 +22,7 @@ void program(void)
     match('.');
 }
 
+// Bloco contendo declaração de variável, subprograma e bloco BEGINEND
 void block(void)
 {
     vardef();
@@ -28,6 +30,7 @@ void block(void)
     beginend();
 }
 
+// Declara variaveis com IDLIST:TIPO;
 void vardef(void)
 {
     if (lookahead == VAR)
@@ -43,16 +46,21 @@ void vardef(void)
     }
 }
 
+// Verifica IDs na tabela de simbolos, retornando erro se estiverem repetidos
 void idlist(int localLexLevel)
 {
+    /*0*/
     int error_stat = 0;
+    /*0*/
 _idlist:
     error_stat = symtab_append(lexeme, localLexLevel);
+    /*1*/
     if (error_stat)
     {
-        fprintf(stderr, "FALTAL ERROR: symbol already defined\n");
+        fprintf(stderr, "FATAL ERROR: symbol already defined\n");
         error_count++;
     }
+    /*1*/
     match(ID);
     if (lookahead == ',')
     {
@@ -61,6 +69,7 @@ _idlist:
     }
 }
 
+// Verifica se o token atual eh um operador lógico (< | <= | > | >= | == | <> | IN)
 int relop()
 {
     switch (lookahead)
@@ -71,12 +80,14 @@ int relop()
     case LEQ:
     case NEQ:
     case EQ:
+    case IN:
         return (lookahead);
     }
 
     return 0;
 }
 
+// Estrutura de um bloco BEGIN com uma lista de statements e no final um END
 void beginend(void)
 {
     match(BEGIN);
@@ -84,6 +95,7 @@ void beginend(void)
     match(END);
 }
 
+// Lista de statements separados por ;
 void stmtlist(void)
 {
 _stmtlist:
@@ -95,6 +107,7 @@ _stmtlist:
     }
 }
 
+// Estrutura de um statement que pode ser um ID, BEGINEND, IF, WHILE ou REPEAT
 void stmt(void)
 {
     switch (lookahead)
@@ -119,15 +132,20 @@ void stmt(void)
     }
 }
 
+// Verifica declaração de variável
 void idstmt(void)
 {
+    /*0*/
     int id_position = symtab_lookup(lexeme, lexlevel);
+    /*0*/
 
+    /*1*/
     if (id_position < 0)
     {
         fprintf(stderr, "FATAL ERROR: symbol not defined\n");
         error_count++;
     }
+    /*1*/
 
     match(ID);
     if (lookahead == ASGN)
@@ -141,6 +159,7 @@ void idstmt(void)
     }
 }
 
+// lista de expressões separados por ","
 void exprlist(void)
 {
     if (lookahead == '(')
@@ -157,6 +176,7 @@ void exprlist(void)
     }
 }
 
+// Um subprograma pode ser uma PROCEDURE ou uma FUNCTION, seguida de um ID, uma lista de parâmetros, separados por ";" e um bloco
 void sbprgdef(void)
 {
     int local_init_position, error_start;
@@ -165,12 +185,16 @@ void sbprgdef(void)
     {
         int isfunc = (lookahead == FUNCTION);
         match(lookahead);
+        /*0*/
         error_start = symtab_append(lexeme, lexlevel);
+        /*0*/
 
         if (error_start)
         {
+            /*1*/
             fprintf(stderr, "FATAL ERROR: already defined\n");
             error_count++;
+            /*1*/
         }
 
         match(ID);
@@ -184,13 +208,18 @@ void sbprgdef(void)
         }
 
         match(';');
+        /*2*/
         lexlevel++; // Incrementa nível léxico
+        /*2*/
         block();
         match(';');
+        /*3*/
         lexlevel--; // Decrementa nível léxico
+        /*3*/
     }
 }
 
+// Lista de parâmetros dentro de parênteses, podendo ter declaração de variável, separado por ";"
 void parmlist(void)
 {
     if (lookahead == '(')
@@ -214,6 +243,7 @@ void parmlist(void)
     }
 }
 
+// Estrutura de decisão que contém uma condição (expressão), THEN um statement, ou um ELSE e um statement
 void ifstmt(void)
 {
     match(IF);
@@ -228,6 +258,7 @@ void ifstmt(void)
     }
 }
 
+// Estrutura de repetição que contém uma condição (expressão) e um statement
 void whilestmt(void)
 {
     match(WHILE);
@@ -236,6 +267,7 @@ void whilestmt(void)
     stmt();
 }
 
+// Estrutura de repetição que contém uma lista de statements e um UNTIL com uma condição (expressão)
 void repeatstmt(void)
 {
     match(REPEAT);
@@ -244,6 +276,7 @@ void repeatstmt(void)
     expr();
 }
 
+// Expressão simples é uma expressão (+ | -) termo, seguido de (+ | - | OR) outro termo
 void smpexpr(void)
 {
     if (lookahead == '+' || lookahead == '-')
@@ -258,6 +291,7 @@ _simpleexpr:
     }
 }
 
+// Expressão é uma expressão simples, seguido de relop e outra expressão simples
 void expr(void)
 {
     smpexpr();
@@ -269,6 +303,7 @@ void expr(void)
     }
 }
 
+// O termo é um fator, seguido de alguma operação (* | / | DIV | MOD | AND) e outro fator
 void term(void)
 {
 _term:
@@ -288,6 +323,7 @@ _term:
     }
 }
 
+// Fator pode ser um NUM, um ID, uma VAR, uma FUNCTION, uma expressão, ou seguido de NOT
 void factor(void)
 {
     switch (lookahead)
@@ -322,6 +358,7 @@ void factor(void)
     }
 }
 
+// Os tipos possíveis são INTEGER, REAL, DOUBLE, BOOLEAN
 void type(void)
 {
     switch (lookahead)
