@@ -111,7 +111,6 @@ _T:
     if (signal)
     {
         acc = -acc;
-        printf("\tneg acc\n");
         signal = 0;
     }
     /*1*/
@@ -123,18 +122,15 @@ _T:
         {
         case '+':
         {
-            // printf ("\tadd acc, stack[sp]\n", oplus);
             pilha[sp] = pilha[sp] + acc;
             break;
         }
         case '-':
         {
-            // printf ("\tsub stack[sp], acc\n", oplus);
             pilha[sp] = pilha[sp] - acc;
             break;
         }
         }
-        printf("\tpop acc\n");
         acc = pop();
         oplus = 0;
     }
@@ -144,7 +140,6 @@ _T:
     {
         /*3*/
         oplus = lookahead;
-        printf("\tpush acc\n");
         push(acc);
         /*3*/
         match(lookahead);
@@ -166,18 +161,15 @@ _F:
         {
         case '*':
         {
-            // printf("\tmul stack[sp], acc\n", otimes);
             pilha[sp] = pilha[sp] * acc;
             break;
         }
         case '/':
         {
-            // printf("\tdiv stack[sp], acc\n", otimes);
             pilha[sp] = pilha[sp] / acc;
             break;
         }
         }
-        printf("\tpop acc\n");
         acc = pop();
         otimes = 0;
     }
@@ -187,7 +179,6 @@ _F:
     {
         /*5*/
         otimes = lookahead;
-        printf("\tpush acc\n");
         push(acc);
         /*5*/
         match(lookahead);
@@ -208,37 +199,37 @@ void F(void)
         break;
     case OCT:
         acc = strtol(lexeme, NULL, 8);
-        /*1*/ printf("\toctmov %s, acc\n", lexeme); /*1*/
+        /*1*/ // printf("\toctmov %s, acc\n", lexeme); /*1*/
         match(OCT);
         break;
     case DEC:
         acc = strtol(lexeme, NULL, 10);
-        /*2*/ printf("\tdecmov %s, acc\n", lexeme); /*2*/
+        /*2*/ // printf("\tdecmov %s, acc\n", lexeme); /*2*/
         match(DEC);
         break;
     case HEX:
         acc = strtol(lexeme, NULL, 16);
-        /*3*/ printf("\thexmov %s, acc\n", lexeme); /*3*/
+        /*3*/ // printf("\thexmov %s, acc\n", lexeme); /*3*/
         match(HEX);
         break;
     case NUM:
         acc = strtod(lexeme, NULL);
-        /*4*/ printf("\tnummov %s, acc\n", lexeme); /*4*/
+        /*4*/ // printf("\tnummov %s, acc\n", lexeme); /*4*/
         match(NUM);
         break;
     case ASGN:
         acc = strtod(lexeme, NULL);
-        /*5*/ printf("\tasgnmov %s, acc\n", lexeme); /*5*/
+        /*5*/ // printf("\tasgnmov %s, acc\n", lexeme); /*5*/
         match(ASGN);
         break;
     case FLT:
         acc = strtod(lexeme, NULL);
-        /*6*/ printf("\tfltmov %s, acc\n", lexeme); /*6*/
+        /*6*/ // printf("\tfltmov %s, acc\n", lexeme); /*6*/
         match(FLT);
         break;
     case EXP:
         acc = strtod(lexeme, NULL);
-        /*7*/ printf("\texpmov %s, acc\n", lexeme); /*7*/
+        /*7*/ // printf("\texpmov %s, acc\n", lexeme); /*7*/
         match(EXP);
         break;
     default:
@@ -249,7 +240,7 @@ void F(void)
             match(ASGN);
             E();
             store(varname, acc);
-            /*9*/ printf("\tstore acc, %s\n", varname); /*9*/
+            /*9*/ // printf("\tstore acc, %s\n", varname); /*9*/
         }
         else
         {
@@ -288,7 +279,6 @@ void cmd(void)
 
     default:
         E();
-        printf("acc: %lg\n", acc);
     }
 }
 
