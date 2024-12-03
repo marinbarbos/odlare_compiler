@@ -29,4 +29,4 @@ enum
 
 extern char *keyword[];
 
-int iskeyword(char*);
+int iskeyword(char *);

@@ -28,12 +28,9 @@ int main(int argc, char *argv[])
     }
     // src = stdin;
     lookahead = gettoken(src);
-    fprintf(stderr, "%d | \n", lookahead);
-
+    
     // Coração da aplicação
     mypas();
 
-    printf("\n%i", lookahead);
-    printf("\nNumero de linhas: %i\n", linenum);
     return 0;
 }

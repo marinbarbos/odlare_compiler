@@ -13,7 +13,7 @@ enum
     HEX,
     NUM,
     ASGN, // ASGN = ":=",
-    FLT,  
+    FLT,
     EXP,
     UC,
     LEQ,

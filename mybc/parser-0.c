@@ -13,76 +13,93 @@ Q -> *F Q | /F Q | <>
 */
 
 // E -> T R
-void E(void) { 
-    if(lookahead == '+' || lookahead == '-') {
+void E(void)
+{
+    if (lookahead == '+' || lookahead == '-')
+    {
         match(lookahead);
     }
-    T(); 
+    T();
     R();
 }
 
 // T -> F Q
-void T(void) { F(); Q(); }
+void T(void)
+{
+    F();
+    Q();
+}
 
 // F -> (E) | DEC | ID
 void F(void)
 {
-    switch(lookahead) {
-        case '(':
-            match('('); E(); match(')');
-            break;
-        case DEC:
-            match(DEC);
-            break;
-        case OCT:
-            match(OCT);
-            break;
-        case HEX:
-            match(HEX);
-            break;
-        default:
-            match(ID);
+    switch (lookahead)
+    {
+    case '(':
+        match('(');
+        E();
+        match(')');
+        break;
+    case DEC:
+        match(DEC);
+        break;
+    case OCT:
+        match(OCT);
+        break;
+    case HEX:
+        match(HEX);
+        break;
+    default:
+        match(ID);
     }
 }
 
-//R -> +T R | -T R | <>
+// R -> +T R | -T R | <>
 void R(void)
 {
     switch (lookahead)
     {
     case '+':
-        match('+'); T(); R();
+        match('+');
+        T();
+        R();
         break;
     case '-':
-        match('-'); T(); R();
+        match('-');
+        T();
+        R();
         break;
-    default:
-        ;
+    default:;
     }
 }
 
-//Q -> *F Q | /F Q | <>
+// Q -> *F Q | /F Q | <>
 void Q(void)
 {
     switch (lookahead)
     {
     case '*':
-        match('*'); F(); Q();
+        match('*');
+        F();
+        Q();
         break;
     case '/':
-        match('/'); F(); Q();
+        match('/');
+        F();
+        Q();
         break;
-    default:
-        ;
+    default:;
     }
 }
 
 void match(int expected)
 {
-    if (lookahead == expected) {
+    if (lookahead == expected)
+    {
         lookahead = getToken(source);
     }
-    else {
+    else
+    {
         fprintf(stderr, "token mismatch\n");
         exit(-3);
     }
