@@ -66,7 +66,7 @@ int isID(FILE *tape)
         }
 
         /* Quando um caracter não alfanumérico for encontrado, devolve-o para a fita
-        e encerra a string do lexeme com '\0' */
+        e encerra a string do lexeme com '0' */
         ungetc(lexeme[i], tape);
         lexeme[i] = 0;
 
@@ -172,7 +172,7 @@ int isOCT(FILE *tape)
         }
 
         /* Quando um caracter não numérico for encontrado, devolve-o para a fita
-        e encerra a string do lexeme com '0' */
+        e encerra a string do lexeme com 0 */
         ungetc(lexeme[i], tape);
         lexeme[i] = 0;
 
@@ -180,7 +180,7 @@ int isOCT(FILE *tape)
         return OCT;
     }
 
-    /* Caso o primeiro caracter não seja '0', devolve-o à fita
+    /* Caso o primeiro caracter não seja 0, devolve-o à fita
     e zera o lexeme para indicar que não foi encontrado um número octal */
     ungetc(lexeme[i], tape);
     lexeme[i] = 0;
@@ -217,7 +217,7 @@ int isHEX(FILE *tape)
             } while (isalnum(lexeme[i] = getc(tape)));
 
             /* Quando um caracter não hexadecimal for encontrado, devolve-o para a fita
-            e encerra a string do lexeme com '\0' */
+            e encerra a string do lexeme com 0 */
             ungetc(lexeme[i], tape);
             lexeme[i] = 0;
 
