@@ -286,8 +286,6 @@ int gettoken(FILE *src)
         return token;
     if ((token = isRELOP(src)))
         return token;
-    if ((token = isDEC(src)))
-        return token;
 
     token = getc(src);
     return token;
