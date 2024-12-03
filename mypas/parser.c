@@ -184,11 +184,9 @@ void sbprgdef(void)
         }
 
         match(';');
-        symtab_libera(lexlevel);
         lexlevel++; // Incrementa nível léxico
         block();
         match(';');
-        symtab_libera(lexlevel);
         lexlevel--; // Decrementa nível léxico
     }
 }

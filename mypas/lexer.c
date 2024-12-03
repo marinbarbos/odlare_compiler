@@ -135,7 +135,6 @@ int isRELOP(FILE *tape)
     return 0;
 }
 
-
 /* Função que determina se o lexeme é um número inteiro ou flutuante válido */
 int isNUM(FILE *tape)
 {
@@ -158,6 +157,12 @@ int isNUM(FILE *tape)
         // Retorna que o lexeme é um número válido
         return NUM;
     }
+
+    /* Caso o caracter lido não seja um dígito, devolve-o à fita
+    e retorna 0 para indicar que não foi encontrado um número */
+    ungetc(aux, tape);
+    return 0;
+}
 
 // Função que ignora espaços vazios e comentários ao longo do código
 void skip_spaces_comments(FILE *tape)
@@ -198,14 +203,9 @@ _skip_spaces_comments:
         goto _skip_spaces_comments;
     }
 
-    /* Devolve o último caracter à fita, seja porque não era o início de um comentário, 
+    /* Devolve o último caracter à fita, seja porque não era o início de um comentário,
        seja porque encontrou um EOF */
     ungetc(head, tape);
-}
-    /* Caso o caracter lido não seja um dígito, devolve-o à fita
-    e retorna 0 para indicar que não foi encontrado um número */
-    ungetc(aux, tape);
-    return 0;
 }
 
 int gettoken(FILE *src)
@@ -220,8 +220,6 @@ int gettoken(FILE *src)
     if ((token = isASGN(src)))
         return token;
     if ((token = isRELOP(src)))
-        return token;
-    if ((token = isDEC(src)))
         return token;
 
     token = getc(src);
